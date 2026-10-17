@@ -92,6 +92,7 @@ input,textarea{width:100%;font:inherit;padding:10px;border-radius:8px;border:1px
  <h2 data-i="p_t"></h2><p class="lead" data-i="p_s"></p>
  <div class="chips" id="chips"></div>
  <div class="grid" id="grid"></div>
+ <p style="text-align:center;margin-top:26px"><button class="btn" id="more"></button></p>
 </div></section>
 
 <section id="how" class="alt"><div class="wrap">
@@ -205,6 +206,11 @@ function applyTheme(){
  if(th)document.documentElement.setAttribute("data-theme",th);
  $("#theme").textContent=dark?"☀️":"🌙";
 }
+// المنتجات الظاهرة في الصفحة الرئيسية قبل "عرض المزيد" (اكتب ids من القائمة)
+var FEATURED=["towel","robe","bottles","sheet","duvet","tray","note","gift"];
+var showAll=false;
+function visible(){var l=PRODUCTS.filter(function(p){return cat==="all"||p.c===cat});return(cat==="all"&&!showAll)?FEATURED.map(P).filter(Boolean):l}
+function moreBtn(){var b=$("#more"),ar=lang==="ar";b.style.display=cat==="all"?"inline-block":"none";b.textContent=showAll?(ar?"عرض أقل":"Show less"):(ar?"عرض المزيد من المنتجات":"See more products")}
 function render(){
  var t=T[lang];
  document.documentElement.lang=lang;document.documentElement.dir=lang==="ar"?"rtl":"ltr";
@@ -212,7 +218,8 @@ function render(){
  $("#lang").textContent=lang==="ar"?"EN":"ع";
  $("#strip").innerHTML=["robe","bottles","sheet","tray","note"].map(function(i){return '<img src="'+IMG[i]+'" alt="">'}).join("");
  $("#chips").innerHTML=[{id:"all"}].concat(CATS).map(function(c){return '<button class="chip" data-cat="'+c.id+'" aria-pressed="'+(cat===c.id)+'">'+(c.id==="all"?t.all:c[lang])+'</button>'}).join("");
- $("#grid").innerHTML=PRODUCTS.filter(function(p){return cat==="all"||p.c===cat}).map(function(p){return '<div class="card"><img src="'+IMG[p.id]+'" alt="'+p[lang]+'" loading="lazy"><div><h3>'+p[lang]+'</h3><span class="price">'+(p.price?p.price+" "+t.cur:t.quote)+'</span><button class="btn" data-add="'+p.id+'">'+t.add+'</button></div></div>'}).join("");
+ $("#grid").innerHTML=visible().map(function(p){return '<div class="card"><img src="'+IMG[p.id]+'" alt="'+p[lang]+'" loading="lazy"><div><h3>'+p[lang]+'</h3><span class="price">'+(p.price?p.price+" "+t.cur:t.quote)+'</span><button class="btn" data-add="'+p.id+'">'+t.add+'</button></div></div>'}).join("");
+ moreBtn();
  $("#steps").innerHTML=t.steps.map(function(s){return '<li><h3>'+s[0]+'</h3><p>'+s[1]+'</p></li>'}).join("");
  $("#pv").textContent=lang==="ar"?"›":"‹";$("#nx").textContent=lang==="ar"?"‹":"›";showSlide(0);
  renderCart();
@@ -233,6 +240,7 @@ document.addEventListener("click",function(e){
 });
 var si=0;function showSlide(d){si=(si+(d||0)+DECK.length)%DECK.length;$("#slide").src=DECK[si];$("#slide").alt="Slide "+(si+1);$("#dc").textContent=(si+1)+" / "+DECK.length}
 $("#pv").onclick=function(){showSlide(-1)};$("#nx").onclick=function(){showSlide(1)};
+$("#more").onclick=function(){showAll=!showAll;render()};
 $("#cartBtn").onclick=function(){$("#drawer").classList.add("open")};
 $("#close").onclick=function(){$("#drawer").classList.remove("open")};
 $("#lang").onclick=function(){lang=lang==="ar"?"en":"ar";save("lang",lang);render()};
